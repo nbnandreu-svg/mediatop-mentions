@@ -8,128 +8,143 @@
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    background: #f3f4f6;
-    color: #1c1e21;
-    font: 15px/1.45 system-ui, sans-serif;
+    background: #eef1f4;
+    color: #1c2430;
+    font: 14px/1.45 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   }
-  .top {
+  button, input { font: inherit; color: inherit; }
+  .appbar {
+    height: 52px;
     background: #fff;
-    border-bottom: 1px solid #e4e6ea;
+    border-bottom: 3px solid #0e4d8b;
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 10px 16px;
-    flex-wrap: wrap;
+    gap: 16px;
+    padding: 0 16px;
   }
-  .top h1 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.011em; }
-  .counts { color: #414141; font-size: 13px; }
-  .scope { color: #6b7280; }
+  .brand { font-weight: 700; color: #0e4d8b; letter-spacing: 0; }
+  .theme { color: #334155; }
   .search {
     margin-left: auto;
-    border: 1px solid #dedbd6;
-    border-radius: 6px;
+    width: min(320px, 46vw);
+    border: 1px solid #c5d0dc;
+    border-radius: 4px;
     padding: 7px 10px;
-    width: min(280px, 100%);
-    font: inherit;
     background: #fff;
   }
-  .views { display: flex; gap: 4px; }
-  .view, .chip {
+  .search:focus { outline: 2px solid #0e4d8b; border-color: #0e4d8b; }
+  .app {
+    display: grid;
+    grid-template-columns: 216px minmax(0, 1fr) 248px;
+    min-height: calc(100vh - 52px);
+  }
+  .nav, .filters {
+    background: #fff;
+    padding: 12px 8px;
+  }
+  .nav { border-right: 1px solid #d5dde6; }
+  .filters { border-left: 1px solid #d5dde6; }
+  .nav h2, .filters h2 {
+    margin: 8px 8px 6px;
+    font-size: 12px;
+    font-weight: 650;
+    color: #5c6b7a;
+  }
+  .nav button, .filters button, .index {
+    display: flex;
+    width: 100%;
+    text-align: left;
     border: 0;
     background: transparent;
-    border-radius: 6px;
-    font: inherit;
+    border-radius: 4px;
+    padding: 8px 10px;
     cursor: pointer;
-    color: #1c1e21;
   }
-  .view { padding: 6px 10px; }
-  .view.is-on, .chip.is-on { background: #e8eefc; color: #1d4ed8; font-weight: 600; }
-  .shell {
+  .nav button.is-on {
+    background: #e7f0fa;
+    color: #0e4d8b;
+    font-weight: 650;
+    box-shadow: inset 3px 0 0 #0e4d8b;
+  }
+  .main { padding: 12px 16px 28px; min-width: 0; }
+  .indexes {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 220px;
-    gap: 12px;
-    max-width: 1040px;
-    margin: 0 auto;
-    padding: 12px 16px 40px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
   }
-  aside { order: 2; }
-  .panel {
+  .index {
     background: #fff;
-    border: 1px solid #e4e6ea;
-    border-radius: 12px;
-    padding: 10px;
-    position: sticky;
-    top: 12px;
-  }
-  .panel h2, .sort, .meta {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 12px;
-    letter-spacing: 0.02em;
-    font-weight: 400;
-  }
-  .panel h2 { margin: 4px 8px 8px; color: #6b7280; }
-  .chip { display: block; width: 100%; text-align: left; padding: 7px 8px; }
-  .sort { margin: 0 0 8px; color: #6b7280; }
-  a.card {
+    border: 1px solid #d5dde6;
     display: block;
-    background: #fff;
-    border: 1px solid #e4e6ea;
-    border-radius: 12px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
+    text-align: left;
+  }
+  .index b { display: block; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .index span { color: #5c6b7a; font-size: 12px; }
+  .index.is-on { border-color: #0e4d8b; background: #f3f8fd; }
+  .note { margin: 0 0 8px; color: #5c6b7a; font-size: 12px; }
+  .panel { background: #fff; border: 1px solid #d5dde6; }
+  .msg {
+    display: grid;
+    grid-template-columns: 4px 1fr auto;
+    gap: 12px;
+    padding: 12px 12px 12px 0;
+    border-bottom: 1px solid #e6ebf0;
     color: inherit;
     text-decoration: none;
-    transition: border-color 0.2s ease;
   }
-  a.card:hover { border-color: #6b7280; }
-  a.card:hover .open { text-decoration: underline; }
-  .src { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
-  .src b { font-size: 15px; font-weight: 600; letter-spacing: -0.011em; }
-  .src .meta { color: #6b7280; }
-  .frag { margin: 6px 0 8px; }
-  .tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  .tag {
-    background: #f3f4f6;
-    border-radius: 999px;
-    padding: 2px 8px;
-    color: #374151;
-  }
-  .open { margin-left: auto; color: #2563eb; font-size: 13px; transition: text-decoration-color 0.2s ease; }
-  .empty { color: #6b7280; padding: 24px 4px; }
-  .summary-block { background: #fff; border: 1px solid #e4e6ea; border-radius: 12px; padding: 8px 12px 4px; margin-bottom: 8px; }
-  .summary-block h2 { margin: 8px 0; font-size: 13px; font-weight: 600; letter-spacing: 0; font-family: system-ui, sans-serif; }
-  .row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid #e4e6ea; }
-  .row span:last-child { font-variant-numeric: tabular-nums; }
-  @media (max-width: 720px) {
-    .shell { grid-template-columns: 1fr; }
-    aside { order: -1; }
-    .panel { position: static; }
-    .search { margin-left: 0; }
+  .msg:hover { background: #f7fafc; }
+  .bar { background: #c5ced6; }
+  .msg h3 { margin: 0 0 2px; font-size: 15px; font-weight: 650; }
+  .meta { color: #5c6b7a; font-size: 12px; }
+  .frag { margin: 6px 0 0; }
+  .page { margin: 4px 0 0; color: #334155; }
+  .open { color: #0e4d8b; font-size: 13px; white-space: nowrap; align-self: start; }
+  .filters button { justify-content: space-between; gap: 8px; }
+  .filters button.is-on { background: #e7f0fa; color: #0e4d8b; font-weight: 650; }
+  .filters .n { color: #5c6b7a; font-variant-numeric: tabular-nums; }
+  .reset { margin: 8px; color: #0e4d8b; }
+  table { width: 100%; border-collapse: collapse; background: #fff; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #e6ebf0; }
+  th { color: #5c6b7a; font-weight: 650; font-size: 12px; }
+  tr.pick { cursor: pointer; }
+  tr.pick:hover { background: #f7fafc; }
+  .empty { color: #5c6b7a; padding: 24px 12px; }
+  @media (max-width: 980px) {
+    .app { grid-template-columns: 1fr; }
+    .nav, .filters { border: 0; }
+    .indexes { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
 <body>
-<div class="top">
-  <h1>Упоминания</h1>
-  <span class="counts">о нас написали <b id="n-about">0</b> · страниц своего сайта <b id="n-site">0</b> · свой Telegram <b id="n-tg">0</b> <span class="scope">по всему сбору</span></span>
-  <div class="views">
-    <button class="view is-on" id="view-feed" type="button">Лента</button>
-    <button class="view" id="view-summary" type="button">Сводка</button>
-  </div>
-  <input class="search" id="q" type="search" placeholder="Поиск по тексту" aria-label="Поиск по тексту">
-</div>
-<div class="shell">
-<main>
-  <p class="sort" id="sort">Порядок сбора. Дата как в карточке.</p>
-  <div id="list"></div>
-  <div id="summary" hidden></div>
-</main>
-<aside>
-  <div class="panel">
+<header class="appbar">
+  <div class="brand">Упоминания</div>
+  <div class="theme">Агропромцифра</div>
+  <input class="search" id="q" type="search" placeholder="Поиск по сообщениям" aria-label="Поиск по сообщениям">
+</header>
+<div class="app">
+  <nav class="nav" aria-label="Отчеты">
+    <h2>Тема</h2>
+    <button type="button" id="nav-summary">Сводный отчет</button>
+    <button type="button" id="nav-sources">Источники</button>
+    <button type="button" id="nav-tags">Теги</button>
+  </nav>
+  <main class="main">
+    <div class="indexes">
+      <button class="index" id="idx-all" type="button"><b id="n-total">0</b><span>сообщения</span></button>
+      <button class="index" id="idx-about" type="button"><b id="n-about">0</b><span>о нас написали</span></button>
+      <button class="index" id="idx-site" type="button"><b id="n-site">0</b><span>страницы своего сайта</span></button>
+      <button class="index" id="idx-tg" type="button"><b id="n-tg">0</b><span>свой Telegram</span></button>
+    </div>
+    <p class="note" id="sort"></p>
+    <div id="list"></div>
+  </main>
+  <aside class="filters" aria-label="Фильтры">
     <h2>Фильтры</h2>
     <div id="filters"></div>
-  </div>
-</aside>
+    <button class="reset" id="reset" type="button" hidden>Сбросить фильтры</button>
+  </aside>
 </div>
 <script src="data/mentions.js"></script>
 <script>
@@ -137,13 +152,13 @@ window.__cabinetErrors = [];
 window.addEventListener("error", function (event) {
   window.__cabinetErrors.push(String(event.message || "error"));
 });
-window.addEventListener("unhandledrejection", function (event) {
-  window.__cabinetErrors.push(String(event.reason || "rejection"));
-});
 var FILTERS = ["Вся лента", "О нас написали", "СМИ", "Документ", "Карточка", "Вакансия и отзыв", "Соцсеть", "Свой сайт"];
 var current = "Вся лента";
 var q = "";
-var view = "feed";
+var screen = "summary";
+var hostFilter = "";
+var themeFilter = "";
+var statusFilter = "";
 
 function items() {
   return Array.isArray(window.MENTIONS) ? window.MENTIONS : [];
@@ -166,11 +181,20 @@ function esc(value) {
     .replace(/"/g, "&quot;");
 }
 
-function match(item) {
-  if (q) {
-    var hay = [item.title, item.frag, item.type, item.key, item.theme, host(item.url)].join(" ").toLowerCase();
-    if (hay.indexOf(q) === -1) return false;
-  }
+function textHit(item) {
+  if (!q) return true;
+  var hay = [item.title, item.frag, item.pullText, item.type, item.key, item.theme, host(item.url)].join(" ").toLowerCase();
+  return hay.indexOf(q) !== -1;
+}
+
+function extraHit(item) {
+  if (hostFilter && host(item.url) !== hostFilter) return false;
+  if (themeFilter && item.theme !== themeFilter) return false;
+  if (statusFilter && item.linkStatus !== statusFilter) return false;
+  return true;
+}
+
+function typeHit(item) {
   if (current === "Вся лента") return true;
   if (current === "О нас написали") return !item.own;
   return item.type === current;
@@ -185,13 +209,13 @@ function tally(rows) {
     if (item.own && item.type === "Соцсеть") ownTg += 1;
     if (!item.own) about += 1;
   });
-  return { about: about, ownSite: ownSite, ownTg: ownTg };
+  return { about: about, ownSite: ownSite, ownTg: ownTg, total: rows.length };
 }
 
-function groups(rows, field) {
+function groups(rows, field, labelOf) {
   var map = {};
   rows.forEach(function (item) {
-    var key = item[field] || "не размечено";
+    var key = labelOf(item) || "не размечено";
     map[key] = (map[key] || 0) + 1;
   });
   return Object.keys(map).map(function (key) {
@@ -202,97 +226,209 @@ function groups(rows, field) {
   });
 }
 
-function renderFilters() {
+function pool() {
+  return items().filter(function (item) {
+    return textHit(item) && extraHit(item);
+  });
+}
+
+function visible() {
+  return pool().filter(typeHit);
+}
+
+function setScreen(name) {
+  screen = name;
+  render();
+}
+
+function renderNav() {
+  document.getElementById("nav-summary").className = screen === "summary" ? "is-on" : "";
+  document.getElementById("nav-sources").className = screen === "sources" ? "is-on" : "";
+  document.getElementById("nav-tags").className = screen === "tags" ? "is-on" : "";
+  document.getElementById("idx-all").className = "index" + (current === "Вся лента" && !hostFilter && !themeFilter && !statusFilter ? " is-on" : "");
+  document.getElementById("idx-about").className = "index" + (current === "О нас написали" ? " is-on" : "");
+  document.getElementById("idx-site").className = "index" + (current === "Свой сайт" ? " is-on" : "");
+  document.getElementById("idx-tg").className = "index" + (current === "Соцсеть" ? " is-on" : "");
+}
+
+function filterButton(label, count, on, action) {
+  var b = document.createElement("button");
+  b.type = "button";
+  b.className = on ? "is-on" : "";
+  b.innerHTML = "<span>" + esc(label) + "</span><span class=\"n\">" + esc(count) + "</span>";
+  b.addEventListener("click", action);
+  return b;
+}
+
+function renderFilters(rows) {
   var box = document.getElementById("filters");
   box.innerHTML = "";
-  FILTERS.forEach(function (name) {
-    var b = document.createElement("button");
-    b.className = "chip" + (name === current ? " is-on" : "");
-    b.type = "button";
-    b.textContent = name;
-    b.addEventListener("click", function () {
+  var slices = ["Вся лента", "О нас написали"];
+  slices.forEach(function (name) {
+    var n = name === "Вся лента" ? rows.length : rows.filter(function (item) { return !item.own; }).length;
+    box.appendChild(filterButton(name, n, current === name && !hostFilter && !themeFilter && !statusFilter, function () {
       current = name;
+      hostFilter = "";
+      themeFilter = "";
+      statusFilter = "";
+      screen = "summary";
       render();
-    });
-    box.appendChild(b);
+    }));
   });
+  var typeTitle = document.createElement("h2");
+  typeTitle.textContent = "Тип сообщения";
+  box.appendChild(typeTitle);
+  FILTERS.slice(2).forEach(function (name) {
+    var n = rows.filter(function (item) { return item.type === name; }).length;
+    box.appendChild(filterButton(name, n, current === name, function () {
+      current = name;
+      screen = "summary";
+      render();
+    }));
+  });
+  var statusTitle = document.createElement("h2");
+  statusTitle.textContent = "Ссылка";
+  box.appendChild(statusTitle);
+  groups(rows, "linkStatus", function (item) { return item.linkStatus; }).forEach(function (row) {
+    box.appendChild(filterButton(row.key, row.n, statusFilter === row.key, function () {
+      statusFilter = statusFilter === row.key ? "" : row.key;
+      screen = "summary";
+      render();
+    }));
+  });
+  var dirty = current !== "Вся лента" || hostFilter || themeFilter || statusFilter || q;
+  document.getElementById("reset").hidden = !dirty;
 }
 
 function renderFeed(rows) {
   var list = document.getElementById("list");
-  document.getElementById("summary").hidden = true;
-  list.hidden = false;
-  document.getElementById("sort").textContent = "Показано " + rows.length + " из " + items().length + ". Порядок сбора. Дата как в карточке.";
+  document.getElementById("sort").textContent = "Показано " + rows.length + " из " + items().length + ". Порядок сбора.";
+  if (!items().length) {
+    list.innerHTML = '<p class="empty">Сбор не подключился. Файл data/mentions.js не загрузился.</p>';
+    return;
+  }
   if (!rows.length) {
     list.innerHTML = '<p class="empty">В этом срезе пусто.</p>';
     return;
   }
-  list.innerHTML = rows.map(function (item) {
-    var own = item.own ? '<span class="tag meta">свои</span>' : "";
-    var status = item.linkStatus || "проверка не запускалась";
-    var reason = item.linkReason ? " · " + item.linkReason : "";
-    var pulled = item.pullText
-      ? '<p class="frag">Со страницы: ' + esc(item.pullText) + '</p>'
-      : '<p class="frag">Текст со страницы не снят. ' + esc(item.linkReason || "") + '</p>';
-    return '<a class="card" href="' + esc(safeUrl(item.url)) + '" target="_blank" rel="noopener noreferrer">' +
-      '<div class="src"><b>' + esc(item.title) + '</b><span class="meta">' + esc(host(item.url)) + '</span><span class="meta">' + esc(item.date) + '</span></div>' +
-      '<p class="frag">' + esc(item.frag) + '</p>' + pulled +
-      '<div class="tags"><span class="tag meta">' + esc(item.type) + '</span>' + own +
-      '<span class="tag meta">ключ: ' + esc(item.key) + '</span>' +
-      '<span class="tag meta">тон: ' + esc(item.tone || "не размечено") + '</span>' +
-      '<span class="tag meta">тема: ' + esc(item.theme || "не размечено") + '</span>' +
-      '<span class="tag meta">автопроверка: ' + esc(status + reason) + '</span>' +
-      '<span class="open">Открыть источник</span></div></a>';
-  }).join("");
+  list.innerHTML = '<div class="panel">' + rows.map(function (item) {
+    var page = item.pullText
+      ? '<p class="page">' + esc(item.pullText) + '</p>'
+      : '<p class="page">Текст со страницы не снят. ' + esc(item.linkReason || "") + '</p>';
+    return '<a class="msg" href="' + esc(safeUrl(item.url)) + '" target="_blank" rel="noopener noreferrer">' +
+      '<span class="bar"></span><div><h3>' + esc(item.title) + '</h3>' +
+      '<div class="meta">' + esc(host(item.url)) + '  ' + esc(item.date) + '  ' + esc(item.type) + '  ' + esc(item.linkStatus || "") + '</div>' +
+      '<p class="frag">' + esc(item.frag) + '</p>' + page +
+      '</div><span class="open">Открыть</span></a>';
+  }).join("") + "</div>";
 }
 
-function renderSummary(rows) {
-  var box = document.getElementById("summary");
-  document.getElementById("list").hidden = true;
-  box.hidden = false;
-  document.getElementById("sort").textContent = "Срез «" + current + "». Показано " + rows.length + " из " + items().length + ".";
-  if (!rows.length) {
-    box.innerHTML = '<p class="empty">В этом срезе пусто.</p>';
+function renderTable(title, rowsData, onPick) {
+  var list = document.getElementById("list");
+  document.getElementById("sort").textContent = title;
+  if (!rowsData.length) {
+    list.innerHTML = '<p class="empty">В этом срезе пусто.</p>';
     return;
   }
-  function block(title, field) {
-    var lines = groups(rows, field).map(function (row) {
-      return '<div class="row"><span>' + esc(row.key) + '</span><span>' + esc(row.n) + '</span></div>';
+  var body = rowsData.map(function (row, index) {
+    return '<tr class="pick" data-i="' + index + '"><td>' + esc(row.key) + '</td><td>' + esc(row.n) + '</td></tr>';
+  }).join("");
+  list.innerHTML = '<div class="panel"><table><thead><tr><th>Название</th><th>Сообщений</th></tr></thead><tbody>' + body + '</tbody></table></div>';
+  list.querySelectorAll("tr.pick").forEach(function (tr) {
+    tr.addEventListener("click", function () {
+      onPick(rowsData[Number(tr.getAttribute("data-i"))]);
+    });
+  });
+}
+
+function renderTagTables(rows) {
+  var list = document.getElementById("list");
+  document.getElementById("sort").textContent = "Теги. Клик по строке сужает ленту сводного отчета.";
+  var types = groups(rows, "type", function (item) { return item.type; });
+  var themes = groups(rows, "theme", function (item) { return item.theme; });
+  function table(caption, data, kind) {
+    var body = data.map(function (row, index) {
+      return '<tr class="pick" data-kind="' + kind + '" data-i="' + index + '"><td>' + esc(row.key) + '</td><td>' + esc(row.n) + '</td></tr>';
     }).join("");
-    return '<section class="summary-block"><h2>' + esc(title) + '</h2>' + lines + '</section>';
+    return '<h2 class="note">' + esc(caption) + '</h2><div class="panel"><table><thead><tr><th>Название</th><th>Сообщений</th></tr></thead><tbody>' + body + '</tbody></table></div>';
   }
-  box.innerHTML = '<p class="sort">В срезе ' + rows.length + '</p>' + block("По типу", "type") + block("По статусу ссылки", "linkStatus");
+  list.innerHTML = table("Тип сообщения", types, "type") + table("Тема", themes, "theme");
+  list.querySelectorAll("tr.pick").forEach(function (tr) {
+    tr.addEventListener("click", function () {
+      var index = Number(tr.getAttribute("data-i"));
+      var row = tr.getAttribute("data-kind") === "theme" ? themes[index] : types[index];
+      if (tr.getAttribute("data-kind") === "theme") themeFilter = row.key;
+      else current = row.key;
+      screen = "summary";
+      render();
+    });
+  });
 }
 
 function render() {
-  var rowsAll = items();
-  var numbers = tally(rowsAll);
+  var all = items();
+  var numbers = tally(all);
+  document.getElementById("n-total").textContent = String(numbers.total);
   document.getElementById("n-about").textContent = String(numbers.about);
   document.getElementById("n-site").textContent = String(numbers.ownSite);
   document.getElementById("n-tg").textContent = String(numbers.ownTg);
-  document.getElementById("view-feed").className = "view" + (view === "feed" ? " is-on" : "");
-  document.getElementById("view-summary").className = "view" + (view === "summary" ? " is-on" : "");
-  renderFilters();
-  var rows = rowsAll.filter(match);
-  if (!rowsAll.length) {
-    document.getElementById("list").innerHTML = '<p class="empty">Сбор не подключился. Файл data/mentions.js не загрузился.</p>';
-    document.getElementById("summary").hidden = true;
+  renderNav();
+  var narrowed = pool();
+  renderFilters(narrowed);
+  var rows = visible();
+  if (screen === "sources") {
+    renderTable("Источники. Клик по строке открывает эти сообщения в сводном отчете.", groups(rows, "host", function (item) { return host(item.url); }), function (row) {
+      hostFilter = row.key;
+      screen = "summary";
+      render();
+    });
     return;
   }
-  if (view === "summary") renderSummary(rows);
-  else renderFeed(rows);
+  if (screen === "tags") {
+    renderTagTables(rows);
+    return;
+  }
+  renderFeed(rows);
 }
 
 document.getElementById("q").addEventListener("input", function (e) {
   q = e.target.value.trim().toLowerCase();
   render();
 });
-document.getElementById("view-feed").addEventListener("click", function () {
-  view = "feed";
+document.getElementById("nav-summary").addEventListener("click", function () { setScreen("summary"); });
+document.getElementById("nav-sources").addEventListener("click", function () { setScreen("sources"); });
+document.getElementById("nav-tags").addEventListener("click", function () { setScreen("tags"); });
+document.getElementById("idx-all").addEventListener("click", function () {
+  current = "Вся лента";
+  hostFilter = "";
+  themeFilter = "";
+  statusFilter = "";
+  screen = "summary";
   render();
 });
-document.getElementById("view-summary").addEventListener("click", function () {
-  view = "summary";
+document.getElementById("idx-about").addEventListener("click", function () {
+  current = "О нас написали";
+  screen = "summary";
+  render();
+});
+document.getElementById("idx-site").addEventListener("click", function () {
+  current = "Свой сайт";
+  screen = "summary";
+  render();
+});
+document.getElementById("idx-tg").addEventListener("click", function () {
+  current = "Соцсеть";
+  screen = "summary";
+  render();
+});
+document.getElementById("reset").addEventListener("click", function () {
+  current = "Вся лента";
+  q = "";
+  hostFilter = "";
+  themeFilter = "";
+  statusFilter = "";
+  screen = "summary";
+  document.getElementById("q").value = "";
   render();
 });
 
