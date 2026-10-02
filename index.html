@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Агропромцифра, упоминания</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f3f4f6;
+    color: #1c1e21;
+    font: 15px/1.45 system-ui, sans-serif;
+  }
+  .top {
+    background: #fff;
+    border-bottom: 1px solid #e4e6ea;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+  }
+  .top h1 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.011em; }
+  .counts { color: #414141; font-size: 13px; }
+  .scope { color: #6b7280; }
+  .search {
+    margin-left: auto;
+    border: 1px solid #dedbd6;
+    border-radius: 6px;
+    padding: 7px 10px;
+    width: min(280px, 100%);
+    font: inherit;
+    background: #fff;
+  }
+  .views { display: flex; gap: 4px; }
+  .view, .chip {
+    border: 0;
+    background: transparent;
+    border-radius: 6px;
+    font: inherit;
+    cursor: pointer;
+    color: #1c1e21;
+  }
+  .view { padding: 6px 10px; }
+  .view.is-on, .chip.is-on { background: #e8eefc; color: #1d4ed8; font-weight: 600; }
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 12px;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 12px 16px 40px;
+  }
+  aside { order: 2; }
+  .panel {
+    background: #fff;
+    border: 1px solid #e4e6ea;
+    border-radius: 12px;
+    padding: 10px;
+    position: sticky;
+    top: 12px;
+  }
+  .panel h2, .sort, .meta {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    font-weight: 400;
+  }
+  .panel h2 { margin: 4px 8px 8px; color: #6b7280; }
+  .chip { display: block; width: 100%; text-align: left; padding: 7px 8px; }
+  .sort { margin: 0 0 8px; color: #6b7280; }
+  a.card {
+    display: block;
+    background: #fff;
+    border: 1px solid #e4e6ea;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+  }
+  a.card:hover { border-color: #6b7280; }
+  a.card:hover .open { text-decoration: underline; }
+  .src { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .src b { font-size: 15px; font-weight: 600; letter-spacing: -0.011em; }
+  .src .meta { color: #6b7280; }
+  .frag { margin: 6px 0 8px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .tag {
+    background: #f3f4f6;
+    border-radius: 999px;
+    padding: 2px 8px;
+    color: #374151;
+  }
+  .open { margin-left: auto; color: #2563eb; font-size: 13px; transition: text-decoration-color 0.2s ease; }
+  .empty { color: #6b7280; padding: 24px 4px; }
+  .summary-block { background: #fff; border: 1px solid #e4e6ea; border-radius: 12px; padding: 8px 12px 4px; margin-bottom: 8px; }
+  .summary-block h2 { margin: 8px 0; font-size: 13px; font-weight: 600; letter-spacing: 0; font-family: system-ui, sans-serif; }
+  .row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid #e4e6ea; }
+  .row span:last-child { font-variant-numeric: tabular-nums; }
+  @media (max-width: 720px) {
+    .shell { grid-template-columns: 1fr; }
+    aside { order: -1; }
+    .panel { position: static; }
+    .search { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Упоминания</h1>
+  <span class="counts">о нас написали <b id="n-about">0</b> · страниц своего сайта <b id="n-site">0</b> · свой Telegram <b id="n-tg">0</b> <span class="scope">по всему сбору</span></span>
+  <div class="views">
+    <button class="view is-on" id="view-feed" type="button">Лента</button>
+    <button class="view" id="view-summary" type="button">Сводка</button>
+  </div>
+  <input class="search" id="q" type="search" placeholder="Поиск по тексту" aria-label="Поиск по тексту">
+</div>
+<div class="shell">
+<main>
+  <p class="sort" id="sort">Порядок сбора. Дата как в карточке.</p>
+  <div id="list"></div>
+  <div id="summary" hidden></div>
+</main>
+<aside>
+  <div class="panel">
+    <h2>Фильтры</h2>
+    <div id="filters"></div>
+  </div>
+</aside>
+</div>
+<script src="data/mentions.js"></script>
+<script>
+window.__cabinetErrors = [];
+window.addEventListener("error", function (event) {
+  window.__cabinetErrors.push(String(event.message || "error"));
+});
+window.addEventListener("unhandledrejection", function (event) {
+  window.__cabinetErrors.push(String(event.reason || "rejection"));
+});
+var FILTERS = ["Вся лента", "О нас написали", "СМИ", "Документ", "Карточка", "Вакансия и отзыв", "Соцсеть", "Свой сайт"];
+var current = "Вся лента";
+var q = "";
+var view = "feed";
+
+function items() {
+  return Array.isArray(window.MENTIONS) ? window.MENTIONS : [];
+}
+
+function host(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ""); }
+  catch (e) { return ""; }
+}
+
+function safeUrl(url) {
+  return /^https?:\/\//i.test(url || "") ? url : "#";
+}
+
+function esc(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function match(item) {
+  if (q) {
+    var hay = [item.title, item.frag, item.type, item.key, item.theme, host(item.url)].join(" ").toLowerCase();
+    if (hay.indexOf(q) === -1) return false;
+  }
+  if (current === "Вся лента") return true;
+  if (current === "О нас написали") return !item.own;
+  return item.type === current;
+}
+
+function tally(rows) {
+  var about = 0;
+  var ownSite = 0;
+  var ownTg = 0;
+  rows.forEach(function (item) {
+    if (item.type === "Свой сайт") ownSite += 1;
+    if (item.own && item.type === "Соцсеть") ownTg += 1;
+    if (!item.own) about += 1;
+  });
+  return { about: about, ownSite: ownSite, ownTg: ownTg };
+}
+
+function groups(rows, field) {
+  var map = {};
+  rows.forEach(function (item) {
+    var key = item[field] || "не размечено";
+    map[key] = (map[key] || 0) + 1;
+  });
+  return Object.keys(map).map(function (key) {
+    return { key: key, n: map[key] };
+  }).sort(function (a, b) {
+    if (b.n !== a.n) return b.n - a.n;
+    return a.key.localeCompare(b.key, "ru");
+  });
+}
+
+function renderFilters() {
+  var box = document.getElementById("filters");
+  box.innerHTML = "";
+  FILTERS.forEach(function (name) {
+    var b = document.createElement("button");
+    b.className = "chip" + (name === current ? " is-on" : "");
+    b.type = "button";
+    b.textContent = name;
+    b.addEventListener("click", function () {
+      current = name;
+      render();
+    });
+    box.appendChild(b);
+  });
+}
+
+function renderFeed(rows) {
+  var list = document.getElementById("list");
+  document.getElementById("summary").hidden = true;
+  list.hidden = false;
+  document.getElementById("sort").textContent = "Показано " + rows.length + " из " + items().length + ". Порядок сбора. Дата как в карточке.";
+  if (!rows.length) {
+    list.innerHTML = '<p class="empty">В этом срезе пусто.</p>';
+    return;
+  }
+  list.innerHTML = rows.map(function (item) {
+    var own = item.own ? '<span class="tag meta">свои</span>' : "";
+    var status = item.linkStatus || "проверка не запускалась";
+    var reason = item.linkReason ? " · " + item.linkReason : "";
+    var pulled = item.pullText
+      ? '<p class="frag">Со страницы: ' + esc(item.pullText) + '</p>'
+      : '<p class="frag">Текст со страницы не снят. ' + esc(item.linkReason || "") + '</p>';
+    return '<a class="card" href="' + esc(safeUrl(item.url)) + '" target="_blank" rel="noopener noreferrer">' +
+      '<div class="src"><b>' + esc(item.title) + '</b><span class="meta">' + esc(host(item.url)) + '</span><span class="meta">' + esc(item.date) + '</span></div>' +
+      '<p class="frag">' + esc(item.frag) + '</p>' + pulled +
+      '<div class="tags"><span class="tag meta">' + esc(item.type) + '</span>' + own +
+      '<span class="tag meta">ключ: ' + esc(item.key) + '</span>' +
+      '<span class="tag meta">тон: ' + esc(item.tone || "не размечено") + '</span>' +
+      '<span class="tag meta">тема: ' + esc(item.theme || "не размечено") + '</span>' +
+      '<span class="tag meta">автопроверка: ' + esc(status + reason) + '</span>' +
+      '<span class="open">Открыть источник</span></div></a>';
+  }).join("");
+}
+
+function renderSummary(rows) {
+  var box = document.getElementById("summary");
+  document.getElementById("list").hidden = true;
+  box.hidden = false;
+  document.getElementById("sort").textContent = "Срез «" + current + "». Показано " + rows.length + " из " + items().length + ".";
+  if (!rows.length) {
+    box.innerHTML = '<p class="empty">В этом срезе пусто.</p>';
+    return;
+  }
+  function block(title, field) {
+    var lines = groups(rows, field).map(function (row) {
+      return '<div class="row"><span>' + esc(row.key) + '</span><span>' + esc(row.n) + '</span></div>';
+    }).join("");
+    return '<section class="summary-block"><h2>' + esc(title) + '</h2>' + lines + '</section>';
+  }
+  box.innerHTML = '<p class="sort">В срезе ' + rows.length + '</p>' + block("По типу", "type") + block("По статусу ссылки", "linkStatus");
+}
+
+function render() {
+  var rowsAll = items();
+  var numbers = tally(rowsAll);
+  document.getElementById("n-about").textContent = String(numbers.about);
+  document.getElementById("n-site").textContent = String(numbers.ownSite);
+  document.getElementById("n-tg").textContent = String(numbers.ownTg);
+  document.getElementById("view-feed").className = "view" + (view === "feed" ? " is-on" : "");
+  document.getElementById("view-summary").className = "view" + (view === "summary" ? " is-on" : "");
+  renderFilters();
+  var rows = rowsAll.filter(match);
+  if (!rowsAll.length) {
+    document.getElementById("list").innerHTML = '<p class="empty">Сбор не подключился. Файл data/mentions.js не загрузился.</p>';
+    document.getElementById("summary").hidden = true;
+    return;
+  }
+  if (view === "summary") renderSummary(rows);
+  else renderFeed(rows);
+}
+
+document.getElementById("q").addEventListener("input", function (e) {
+  q = e.target.value.trim().toLowerCase();
+  render();
+});
+document.getElementById("view-feed").addEventListener("click", function () {
+  view = "feed";
+  render();
+});
+document.getElementById("view-summary").addEventListener("click", function () {
+  view = "summary";
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

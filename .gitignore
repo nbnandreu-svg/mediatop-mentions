@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+docs/_*.txt
+scripts/_peek_misses.py
+scripts/_peek_m06.py
+scripts/_show_pulls.py
