@@ -8,22 +8,31 @@
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    background: #eef1f4;
+    background: #dfe6ee;
     color: #1c2430;
-    font: 14px/1.45 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font: 14px/1.4 "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   }
   button, input { font: inherit; color: inherit; }
   .appbar {
-    height: 52px;
-    background: #fff;
-    border-bottom: 3px solid #0e4d8b;
+    height: 56px;
+    background: #0b2a4a;
+    color: #fff;
     display: flex;
     align-items: center;
     gap: 16px;
     padding: 0 16px;
   }
-  .brand { font-weight: 700; color: #0e4d8b; letter-spacing: 0; }
-  .theme { color: #334155; }
+  .brand { font-weight: 700; }
+  .theme {
+    background: #16406e;
+    border-radius: 4px;
+    padding: 6px 10px;
+  }
+  .limit {
+    color: #c5d4e4;
+    font-size: 12px;
+    max-width: 420px;
+  }
   .search {
     margin-left: auto;
     width: min(320px, 46vw);
@@ -31,6 +40,7 @@
     border-radius: 4px;
     padding: 7px 10px;
     background: #fff;
+    color: #1c2430;
   }
   .search:focus { outline: 2px solid #0e4d8b; border-color: #0e4d8b; }
   .app {
@@ -38,18 +48,25 @@
     grid-template-columns: 216px minmax(0, 1fr) 248px;
     min-height: calc(100vh - 52px);
   }
-  .nav, .filters {
-    background: #fff;
-    padding: 12px 8px;
+  .nav, .filters { padding: 12px 8px; }
+  .nav { background: #0b2a4a; color: #d6e2ee; }
+  .nav h2 { color: #8eabc4; }
+  .nav button { color: #d6e2ee; }
+  .nav button.is-on {
+    background: #16406e;
+    color: #fff;
+    font-weight: 650;
+    box-shadow: inset 3px 0 0 #7eb6ea;
   }
-  .nav { border-right: 1px solid #d5dde6; }
+  .filters { background: #fff; border-left: 1px solid #d5dde6; }
   .filters { border-left: 1px solid #d5dde6; }
   .nav h2, .filters h2 {
     margin: 8px 8px 6px;
     font-size: 12px;
     font-weight: 650;
-    color: #5c6b7a;
   }
+  .nav h2 { color: #8eabc4; }
+  .filters h2 { color: #5c6b7a; }
   .nav button, .filters button, .index {
     display: flex;
     width: 100%;
@@ -60,12 +77,10 @@
     padding: 8px 10px;
     cursor: pointer;
   }
-  .nav button.is-on {
-    background: #e7f0fa;
-    color: #0e4d8b;
-    font-weight: 650;
-    box-shadow: inset 3px 0 0 #0e4d8b;
-  }
+  .mix { display: flex; height: 28px; margin: 0 0 12px; background: #fff; border: 1px solid #d5dde6; overflow: hidden; }
+  .mix-seg { min-width: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; white-space: nowrap; overflow: hidden; }
+  .rules { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+  .rules button { border: 1px solid #0e4d8b; background: #f3f8fd; color: #0e4d8b; border-radius: 4px; padding: 4px 8px; cursor: pointer; }
   .main { padding: 12px 16px 28px; min-width: 0; }
   .indexes {
     display: grid;
@@ -121,6 +136,7 @@
 <header class="appbar">
   <div class="brand">Упоминания</div>
   <div class="theme">Агропромцифра</div>
+  <div class="limit" id="limit"></div>
   <input class="search" id="q" type="search" placeholder="Поиск по сообщениям" aria-label="Поиск по сообщениям">
 </header>
 <div class="app">
@@ -137,6 +153,8 @@
       <button class="index" id="idx-site" type="button"><b id="n-site">0</b><span>страницы своего сайта</span></button>
       <button class="index" id="idx-tg" type="button"><b id="n-tg">0</b><span>свой Telegram</span></button>
     </div>
+    <div class="mix" id="mix"></div>
+    <div class="rules" id="rules"></div>
     <p class="note" id="sort"></p>
     <div id="list"></div>
   </main>
@@ -300,15 +318,58 @@ function renderFilters(rows) {
   document.getElementById("reset").hidden = !dirty;
 }
 
+var MIX = {
+  "СМИ": "#0e4d8b",
+  "Документ": "#3d6b4f",
+  "Карточка": "#8a5a12",
+  "Вакансия и отзыв": "#6b3f73",
+  "Соцсеть": "#1d6f8a",
+  "Свой сайт": "#35506e"
+};
+
+function renderMix(all) {
+  var box = document.getElementById("mix");
+  var total = all.length || 1;
+  box.innerHTML = groups(all, "type", function (item) { return item.type; }).map(function (row) {
+    var width = Math.max(8, Math.round(row.n / total * 100));
+    return '<div class="mix-seg" style="width:' + width + '%;background:' + (MIX[row.key] || "#5c6b7a") + '">' + esc(row.key) + " " + row.n + "</div>";
+  }).join("");
+}
+
+function ruleButton(label, clear) {
+  var b = document.createElement("button");
+  b.type = "button";
+  b.textContent = label;
+  b.addEventListener("click", function () {
+    clear();
+    render();
+  });
+  return b;
+}
+
+function renderRules() {
+  var box = document.getElementById("rules");
+  box.innerHTML = "";
+  if (q) box.appendChild(ruleButton("поиск: " + q, function () { q = ""; document.getElementById("q").value = ""; }));
+  if (hostFilter) box.appendChild(ruleButton("источник: " + hostFilter, function () { hostFilter = ""; }));
+  if (themeFilter) box.appendChild(ruleButton("тема: " + themeFilter, function () { themeFilter = ""; }));
+  if (statusFilter) box.appendChild(ruleButton("ссылка: " + statusFilter, function () { statusFilter = ""; }));
+  if (current !== "Вся лента") box.appendChild(ruleButton(current, function () { current = "Вся лента"; }));
+}
+
+function sliceLine(rows) {
+  return "Показано " + rows.length + " из " + items().length + ". Порядок сбора, не календарь публикаций.";
+}
+
 function renderFeed(rows) {
   var list = document.getElementById("list");
-  document.getElementById("sort").textContent = "Показано " + rows.length + " из " + items().length + ". Порядок сбора.";
+  document.getElementById("sort").textContent = sliceLine(rows);
   if (!items().length) {
     list.innerHTML = '<p class="empty">Сбор не подключился. Файл data/mentions.js не загрузился.</p>';
     return;
   }
   if (!rows.length) {
-    list.innerHTML = '<p class="empty">В этом срезе пусто.</p>';
+    list.innerHTML = '<p class="empty">В этом срезе пусто. Снимите одно правило над лентой.</p>';
     return;
   }
   list.innerHTML = '<div class="panel">' + rows.map(function (item) {
@@ -372,6 +433,9 @@ function render() {
   document.getElementById("n-about").textContent = String(numbers.about);
   document.getElementById("n-site").textContent = String(numbers.ownSite);
   document.getElementById("n-tg").textContent = String(numbers.ownTg);
+  document.getElementById("limit").textContent = "В ленте " + all.length + " записей ручного сбора. Это не полный медиапоток.";
+  renderMix(all);
+  renderRules();
   renderNav();
   var narrowed = pool();
   renderFilters(narrowed);

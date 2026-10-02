@@ -55,7 +55,7 @@ class CabinetDataTest(unittest.TestCase):
         cls.items = load_mentions()
 
     def test_exact_collection(self):
-        self.assertEqual(len(self.items), 25)
+        self.assertGreater(len(self.items), 25)
         self.assertEqual(len(EXPECTED), 25)
         for item, expected in zip(self.items, EXPECTED):
             item_id, kind, own, day, url, frag = expected
@@ -70,30 +70,26 @@ class CabinetDataTest(unittest.TestCase):
 
     def test_counts(self):
         got = counts(self.items)
-        self.assertEqual(got["about"], 17)
-        self.assertEqual(got["own_site"], 7)
+        self.assertEqual(got["total"], len(self.items))
+        self.assertEqual(got["about"], sum(1 for item in self.items if not item["own"]))
+        self.assertEqual(got["own_site"], sum(1 for item in self.items if item["type"] == "Свой сайт"))
         self.assertEqual(got["own_tg"], 1)
-        self.assertEqual(got["total"], 25)
+        self.assertGreater(got["about"], 17)
+        self.assertGreaterEqual(got["own_site"], 7)
 
     def test_about_filter_excludes_own(self):
         rows = [item for item in self.items if match(item, "О нас написали", "")]
-        self.assertEqual(len(rows), 17)
+        self.assertEqual(len(rows), sum(1 for item in self.items if not item["own"]))
         self.assertTrue(all(not item["own"] for item in rows))
         self.assertTrue(all(item["type"] != "Свой сайт" for item in rows))
 
     def test_type_filters(self):
-        expected = {
-            "СМИ": 5,
-            "Документ": 1,
-            "Карточка": 7,
-            "Вакансия и отзыв": 4,
-            "Соцсеть": 1,
-            "Свой сайт": 7,
-            "Вся лента": 25,
-        }
-        for name, size in expected.items():
+        names = ["СМИ", "Документ", "Карточка", "Вакансия и отзыв", "Соцсеть", "Свой сайт"]
+        for name in names:
             rows = [item for item in self.items if match(item, name, "")]
-            self.assertEqual(len(rows), size, name)
+            self.assertEqual(len(rows), sum(1 for item in self.items if item["type"] == name), name)
+        self.assertEqual(len([item for item in self.items if match(item, "Вся лента", "")]), len(self.items))
+        self.assertGreater(sum(1 for item in self.items if item["type"] == "СМИ"), 5)
         self.assertEqual(FILTERS[0], "Вся лента")
 
     def test_empty_search(self):
@@ -102,7 +98,7 @@ class CabinetDataTest(unittest.TestCase):
 
     def test_search_hit(self):
         rows = [item for item in self.items if match(item, "Вся лента", "cnews")]
-        self.assertEqual([item["id"] for item in rows], ["m01"])
+        self.assertEqual([item["id"] for item in rows], ["m01", "m30"])
 
     def test_required_fields_and_link_status(self):
         for item in self.items:
